@@ -1,15 +1,41 @@
 const express = require('express');
 const req = require('express/lib/request');
+const LuhnService = require('../services/luhn');
 
 function luhnApi(app) {
     const router = express.Router();
     app.use("/luhn", router);
+    const luhnService = new LuhnService();
 
     router.get("/", async function(req, res, next){
+        console.log('getluhn', luhn);
         try {
+            const luhn1 = await luhnService.getLuhn(luhn.luhn);
           res.status(200).json({
-              isValid: isValidNumberCreditCard()
+              luhn : luhn1,
+              message: 'luhn request'
           });
+        } catch (err) {
+            next(err);
+        }
+    });
+
+    router.put("/", async function(req, res, next){
+        const { body: number } = req;
+        try {
+            const isValid = await isValidNumberCreditCard(number);
+            if (isValid){
+                const luhnCreated = await luhnService.createLuhn(number);
+                res.status(200).json({
+                    data: luhnCreated,
+                    message: 'luhn created succesfully'
+                });
+            }else{
+                res.status(200).json({
+                    message: 'the credit carda is invalid'
+                });
+            }
+          
         } catch (error) {
             next(err);
         }
@@ -25,6 +51,7 @@ function luhnApi(app) {
             next(err);
         }
     });
+
 
     function split_numbers(n){
         return new Promise((resolve) => {
