@@ -47,7 +47,7 @@ function luhnApi(app) {
             res.status(200).json({
                 isValid: await isValidNumberCreditCard(number)
             });
-        } catch (error) {
+        } catch (err) {
             next(err);
         }
     });
